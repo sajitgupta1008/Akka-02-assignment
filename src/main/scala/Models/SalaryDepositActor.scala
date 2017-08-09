@@ -9,6 +9,7 @@ class SalaryDepositActor(database: DatabaseService) extends Actor with ActorLogg
     case (account: Account, billers: List[Biller], salary: Int) =>
 
       database.updateBalance(account.accountNo, salary)
+      log.info("$salary deposited in $account")
 
       billers.foreach {
 
@@ -32,6 +33,7 @@ class SalaryDepositActor(database: DatabaseService) extends Actor with ActorLogg
           val actorRef = context.actorOf(Props(classOf[BillProcessorCarActor], database))
           actorRef ! (database.getAccount(account.accountNo), biller)
       }
+      log.info(s"transactions completed for $account, sender was" + sender())
       sender() ! "success"
   }
 
